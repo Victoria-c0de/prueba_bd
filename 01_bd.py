@@ -2,7 +2,7 @@ from conexionbase import *
 from tkinter import ttk
 from tkinter import *
 import time
-
+# integrantes = victoria molina, maximiliano campos
 db = BaseDatos()
 ventana = Tk()
 ventana.geometry("600x500")
@@ -60,12 +60,12 @@ tvestacion.heading("entrada",text="ENTRADA")
 tvestacion.heading("salida",text="SALIDA")
 tvestacion.heading("costo",text="COSTO")
 
-def vaciarGrilla():
+def vaciarGrilla(): #limpiar tabla
     filas = tvestacion.get_children() #obtener cantidad de filas
     for fila in filas:
         tvestacion.delete(fila)
         
-def cargarDatos():
+def cargarDatos(): #recarga de datos
     vaciarGrilla()
     sql = """SELECT * FROM parking"""
     db.cursor.execute(sql)
@@ -74,16 +74,17 @@ def cargarDatos():
         id = fila[0]
         tvestacion.insert("",END, id,text=id,values=fila)
 
-def egreso_patente():
+def egreso_patente():# revisar egresos
     if validar():
         hora_egreso = int(time.time())
         costo = calcularcosto()
-        val = (hora_egreso, costo,tvestacion.selection()[0])
-        sql = """UPDATE parking SET salida=%s, costo%s where id=%s"""
+        val = (hora_egreso, costo,int(tvestacion.selection()[0]))
+        sql = """UPDATE parking SET salida=%s, costo=%s WHERE id=%s"""
         db.cursor.execute(sql,val)
         cargarDatos()
         entrypatente.delete(0, END)
         LblMensaje.config(text="Patente egresada correctamente",fg="green")
+        db.conn.commit()
     else:
 
         try:
@@ -98,7 +99,7 @@ def egreso_patente():
             
         #cargar datos
 
-def validar():
+def validar(): #validacion interna
     r = len(patente.get())
     return r
 
@@ -116,70 +117,35 @@ def ingresar_patente():
         db.cursor.execute(sql, (patente, hora_ingreso))
         db.conn.commit()
         
-        print("Ingreso", f"Vehículo con patente {patente} ingresado correctamente.")
+        LblMensaje.config(text=f"Vehículo con patente {patente} ingresado correctamente.",fg="green")
     else:
-        print("Error", "Por favor, ingresa una patente válida.")        
+        LblMensaje.config(text="Por favor, ingresa una patente válida.",fg="red")        
 
     #cargar datos
     cargarDatos()
     #limpiar campos
     entrypatente.delete(0, END)
 
-def calcularcosto():
-    hora_ingreso = int(time.time())
+def calcularcosto(): #calculo de costo por tiempo en minutos
+    val = int(tvestacion.selection()[0])
+    sql = f"""select entrada from parking where id={val}"""
+    db.cursor.execute(sql)
+    horas = db.cursor.fetchone()[0]
+    hora_ingreso = horas
     hora_egreso = int(time.time())
-    tiempo = (hora_egreso - hora_ingreso)
+    tiempo = (hora_egreso-hora_ingreso)/60
     if tiempo < 4:
         costo = 100*tiempo
     else:
         costo = tiempo*30
     return costo
-#botones
+#boton ingreso
 ingreso_button = Button(marco, text="Ingreso", command=ingresar_patente)
 ingreso_button.grid(row = 1, column = 3)
 
 #boton de egreso
 egreso_button = Button(marco, text="Egreso", command=egreso_patente)
 egreso_button.grid(row = 4, column = 1, columnspan = 3)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 cargarDatos()
 ventana.mainloop()
