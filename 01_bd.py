@@ -77,9 +77,9 @@ def cargarDatos():
 def egreso_patente():
     if validar():
         hora_egreso = int(time.time())
-        monto()
-        val = (hora_egreso, calcularcosto())
-        sql = """UPDATE estudiante SET salida=%s, costo%s"""
+        costo = calcularcosto()
+        val = (hora_egreso, costo,tvestacion.selection()[0])
+        sql = """UPDATE parking SET salida=%s, costo%s where id=%s"""
         db.cursor.execute(sql,val)
         cargarDatos()
         entrypatente.delete(0, END)
@@ -97,7 +97,6 @@ def egreso_patente():
             LblMensaje.config(text="Ingreso de patente no valida",fg="red")
             
         #cargar datos
-         
 
 def validar():
     r = len(patente.get())
@@ -126,6 +125,15 @@ def ingresar_patente():
     #limpiar campos
     entrypatente.delete(0, END)
 
+def calcularcosto():
+    hora_ingreso = int(time.time())
+    hora_egreso = int(time.time())
+    tiempo = (hora_egreso - hora_ingreso)
+    if tiempo < 4:
+        costo = 100*tiempo
+    else:
+        costo = tiempo*30
+    return costo
 #botones
 ingreso_button = Button(marco, text="Ingreso", command=ingresar_patente)
 ingreso_button.grid(row = 1, column = 3)
