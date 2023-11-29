@@ -72,6 +72,12 @@ def cargarDatos():
     for fila in filas:
         id = fila[0]
         tvestacion.insert("",END, id,text=id,values=fila)
+        
+#botones
+
+
+
+
 
 
 
