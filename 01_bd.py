@@ -72,10 +72,33 @@ def cargarDatos():
     for fila in filas:
         id = fila[0]
         tvestacion.insert("",END, id,text=id,values=fila)
+# Función para el botón de ingreso
+def ingresar_patente():
+    patente = entrypatente.get()
+    
+    if patente:
+        # Obtener la hora de ingreso
+        hora_ingreso = int(time.time())
+
+        # Insertar registro en la tabla
+        #insertar en columanas id	patente	entrada	salida	costo	
+        sql = "INSERT INTO parking (id, patente, entrada, salida, costo) VALUES (NULL, %s, %s, NULL, %s)"
+        cursor.execute(sql, (patente, hora_ingreso))
+        conn.commit()
         
+        print("Ingreso", f"Vehículo con patente {patente} ingresado correctamente.")
+    else:
+        print("Error", "Por favor, ingresa una patente válida.")        
+
+    #cargar datos
+    cargarDatos()
+    #limpiar campos
+    entrypatente.delete(0, END)
 #botones
+ingreso_button = Button(marco, text="Ingreso", command=ingresar_patente)
+ingreso_button.grid(row = 1, column = 3)
 
-
+# Función para el botón de egreso
 
 
 
