@@ -82,9 +82,9 @@ def ingresar_patente():
 
         # Insertar registro en la tabla
         #insertar en columanas id	patente	entrada	salida	costo	
-        sql = "INSERT INTO parking (id, patente, entrada, salida, costo) VALUES (NULL, %s, %s, NULL, %s)"
-        cursor.execute(sql, (patente, hora_ingreso))
-        conn.commit()
+        sql = "INSERT INTO parking (id, patente, entrada, salida, costo) VALUES (NULL, %s, %s, NULL, NULL)"
+        db.cursor.execute(sql, (patente, hora_ingreso))
+        db.conn.commit()
         
         print("Ingreso", f"Vehículo con patente {patente} ingresado correctamente.")
     else:
@@ -98,38 +98,78 @@ def ingresar_patente():
 ingreso_button = Button(marco, text="Ingreso", command=ingresar_patente)
 ingreso_button.grid(row = 1, column = 3)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#boton de egreso
+egreso_button = Button(marco, text="Ingreso", command=egreso_button)
+egreso_button.grid(row = 1, column = 3)
+
+#funcion del costo
+def calcularCosto(hora_ingreso, hora_egreso):
+    # Calcular el tiempo de permanencia
+    tiempo_permanencia = hora_egreso - hora_ingreso
+
+    # Calcular el costo
+    costo = 0
+    if tiempo_permanencia < 240:
+        costo = 100
+    else:
+        costo = tiempo_permanencia * 10
+
+    return costo
 # Función para el botón de egreso
+def egreso_patente():
+    patente = entrypatente.get()
+    
+    if patente:
+        # Obtener la hora de egreso
+        hora_egreso = int(time.time())
 
+        # Insertar registro en la tabla
+        #insertar en columanas id	patente	entrada	salida	costo	
+        sql = "UPDATE parking SET salida = %s WHERE patente = %s"
+        db.cursor.execute(sql, (hora_egreso, patente))
+        db.conn.commit()
+        
+        print("Egreso", f"Vehículo con patente {patente} egresado correctamente.")
+    else:
+        print("Error", "Por favor, ingresa una patente válida.")        
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #cargar datos
+    cargarDatos()
+    #limpiar campos
+    entrypatente.delete(0, END)
 
 
 
