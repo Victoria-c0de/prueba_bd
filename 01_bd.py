@@ -11,6 +11,7 @@ ventana.config(bg="#E5C06F")
 
 #variables string
 patente = StringVar()
+entrada = StringVar()
 
 #marco principal
 marco = LabelFrame(ventana)
@@ -72,6 +73,37 @@ def cargarDatos():
     for fila in filas:
         id = fila[0]
         tvestacion.insert("",END, id,text=id,values=fila)
+
+def modificar():
+    if validar():
+        hora_egreso = int(time.time())
+        monto()
+        val = (hora_egreso, )
+        sql = """UPDATE estudiante SET salida=%s, costo%s"""
+        db.cursor.execute(sql,val)
+        cargarDatos()
+        entrypatente.delete(0, END)
+        LblMensaje.config(text="registro actualizado exitosamente",fg="green")
+    else:
+        try:
+            selected_item = tvEstud.focus()
+            item_details = tvEstud.item(selected_item)
+            tupled_items = item_details.get("values")
+            TxtRut.delete(0, END)
+            TxtRut.insert(0,tupled_items[1])
+            TxtNombre.delete(0, END)
+            TxtNombre.insert(0,tupled_items[2])
+            TxtApellidos.delete(0, END)
+            TxtApellidos.insert(0,tupled_items[3])
+            TxtDireccion.delete(0, END)
+            TxtDireccion.insert(0,tupled_items[4])
+        except IndexError:
+            LblMensaje.config(text="elija un registro para modificar",fg="red")
+            
+def validar():
+    r = len(patente.get())
+    return r
+
 # Función para el botón de ingreso
 def ingresar_patente():
     patente = entrypatente.get()
@@ -82,9 +114,9 @@ def ingresar_patente():
 
         # Insertar registro en la tabla
         #insertar en columanas id	patente	entrada	salida	costo	
-        sql = "INSERT INTO parking (id, patente, entrada, salida, costo) VALUES (NULL, %s, %s, NULL, %s)"
-        cursor.execute(sql, (patente, hora_ingreso))
-        conn.commit()
+        sql = "INSERT INTO parking (id, patente, entrada, salida, costo) VALUES (NULL, %s, %s, NULL, NULL)"
+        db.cursor.execute(sql, (patente, hora_ingreso))
+        db.conn.commit()
         
         print("Ingreso", f"Vehículo con patente {patente} ingresado correctamente.")
     else:
